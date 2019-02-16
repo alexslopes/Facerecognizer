@@ -1,4 +1,4 @@
-package com.ifba.ads.Facerecognizer.recognizer;
+package com.ifba.ads.Facerecognizer.javacv;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,7 +20,7 @@ public class DetectFaces {
 
 	static CascadeClassifier faceDetector = new CascadeClassifier("/home/alex/eclipse-workspace/Facerecognizer/cascades/frontalface.xml");
 	//TODO fazer retornar a face detectada e armazenar em um array
-	public static boolean detectFaces(BufferedImage image) throws IOException {
+	public static Mat detectFaces(BufferedImage image) throws IOException {
 		Rect mainFace;
 		Mat rgbaMat = FileUtils.BufferedImage2Mat(image);
 		Mat greyMat = new Mat();
@@ -34,7 +34,8 @@ public class DetectFaces {
 		resize(detectFace, detectFace, new opencv_core.Size(160, 160));
 		imwrite("/home/alex/eclipse-workspace/Facerecognizer/fotos/pessoa." + 1 + "." + 1 + ".jpg", detectFace);
 		
-		return true;
+		//return true;
+		return detectFace;
 	}
 	
 	

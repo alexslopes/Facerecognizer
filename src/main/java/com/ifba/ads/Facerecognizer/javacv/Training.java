@@ -1,4 +1,4 @@
-package com.ifba.ads.Facerecognizer.recognizer;
+package com.ifba.ads.Facerecognizer.javacv;
 
 import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
