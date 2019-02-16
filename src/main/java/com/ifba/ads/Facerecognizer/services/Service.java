@@ -13,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.ifba.ads.Facerecognizer.recognizer.DetectFaces;
+import com.ifba.ads.Facerecognizer.recognizer.Training;
 import com.ifba.ads.Facerecognizer.utils.FileUtils;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
@@ -53,6 +54,13 @@ public class Service {
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
 			DetectFaces.detectFaces(image);
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			System.out.println(Training.train());
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

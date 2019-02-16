@@ -19,13 +19,13 @@ public class Training {
 	
 	public static final int IMG_SIZE = 160;
 
-    public static final String EIGEN_FACES_CLASSIFIER = "eigenFacesClassifier.yml";
+    public static final String EIGEN_FACES_CLASSIFIER = "/home/alex/eclipse-workspace/Facerecognizer/recursos/eigenFacesClassifier.yml";
     public static final String FISHER_FACES_CLASSIFIER = "fisherFacesClassifier.yml";
     public static final String LBPH_FACES_CLASSIFIER = "lbphFacesClassifier.yml";
     
 public static boolean train() throws Exception{
     	
-    	File photosFolder = new File("src\\fotos");
+    	File photosFolder = new File("/home/alex/eclipse-workspace/Facerecognizer/fotos");
         if (!photosFolder.exists()) return false;
 
         FilenameFilter imageFilter = new FilenameFilter() {
@@ -51,7 +51,7 @@ public static boolean train() throws Exception{
         
         FaceRecognizer eigenfaces = opencv_face.EigenFaceRecognizer.create();
         eigenfaces.train(photos, labels);
-        File f = new File(photosFolder, EIGEN_FACES_CLASSIFIER);
+        File f = new File(EIGEN_FACES_CLASSIFIER);
         f.createNewFile();
         eigenfaces.save(f.getAbsolutePath());
         return true;
