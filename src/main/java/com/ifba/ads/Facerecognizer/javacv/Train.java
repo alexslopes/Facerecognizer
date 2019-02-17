@@ -15,7 +15,7 @@ import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_core.Size;
 import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
 
-public class Training {
+public class Train {
 	
 	public static final int IMG_SIZE = 160;
 
@@ -23,19 +23,8 @@ public class Training {
     public static final String FISHER_FACES_CLASSIFIER = "fisherFacesClassifier.yml";
     public static final String LBPH_FACES_CLASSIFIER = "lbphFacesClassifier.yml";
     
-public static boolean train() throws Exception{
-    	
-    	File photosFolder = new File("/home/alex/eclipse-workspace/Facerecognizer/fotos");
-        if (!photosFolder.exists()) return false;
-
-        FilenameFilter imageFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".png");
-            }
-        };
-        
-        File[] files = photosFolder.listFiles(imageFilter);
+public static boolean train(File[] files) throws Exception{
+    
         MatVector photos = new MatVector(files.length);
         Mat labels = new Mat(files.length, 1, CV_32SC1);
         IntBuffer rotulosBuffer = labels.createBuffer();

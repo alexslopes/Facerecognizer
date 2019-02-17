@@ -32,8 +32,6 @@ public class DetectFaces {
 		mainFace = faces.get(0);
 		Mat detectFace = new Mat(greyMat, mainFace);
 		resize(detectFace, detectFace, new opencv_core.Size(160, 160));
-		imwrite("/home/alex/eclipse-workspace/Facerecognizer/fotos/pessoa." + 1 + "." + 1 + ".jpg", detectFace);
-		
 		//return true;
 		return detectFace;
 	}

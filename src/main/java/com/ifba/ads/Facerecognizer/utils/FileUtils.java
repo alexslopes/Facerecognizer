@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,11 +17,13 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
 public class FileUtils {
 
-	public static void createFolderIfNotExists(String dirName) throws SecurityException {
+	public static File createFolderIfNotExists(String dirName) throws SecurityException {
     	File theDir = new File(dirName);
     	if (!theDir.exists()) {
     		theDir.mkdir();
     	}
+    	
+    	return theDir;
     }
 	
 	public static void saveToFile(InputStream inStream, String target) throws IOException {
@@ -41,5 +44,19 @@ public class FileUtils {
 		    ImageIO.write(image, "jpg", byteArrayOutputStream);
 		    byteArrayOutputStream.flush();
 		    return imdecode(new Mat(byteArrayOutputStream.toByteArray()), CV_LOAD_IMAGE_UNCHANGED);
+	}
+	
+	public static File[] getFiles(String local) {
+		File photosFolder = new File(local);
+        if (!photosFolder.exists()) return null;
+
+        FilenameFilter imageFilter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".png");
+            }
+        };
+        
+        return photosFolder.listFiles(imageFilter);
 	}
 }

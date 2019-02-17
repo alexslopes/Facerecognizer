@@ -11,7 +11,7 @@ public class Recognize {
 	
 	public static void recognize(Mat face) {
 		opencv_face.FaceRecognizer recognizer =  opencv_face.EigenFaceRecognizer.create();
-		File f = new File(Training.EIGEN_FACES_CLASSIFIER);
+		File f = new File(Train.EIGEN_FACES_CLASSIFIER);
         recognizer.read(f.getAbsolutePath());
         IntPointer label = new IntPointer(1);
         DoublePointer confiability = new DoublePointer(1);
@@ -23,7 +23,7 @@ public class Recognize {
         if(predict == -1){
             status = "Desconhecido";
         }else{
-            status = "Conhecido";
+            status = Integer.toString(predict);
         }
         
         System.out.println(status);;

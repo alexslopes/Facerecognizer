@@ -1,5 +1,7 @@
 package com.ifba.ads.Facerecognizer.services;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +18,7 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 
 import com.ifba.ads.Facerecognizer.javacv.DetectFaces;
 import com.ifba.ads.Facerecognizer.javacv.Recognize;
-import com.ifba.ads.Facerecognizer.javacv.Training;
+import com.ifba.ads.Facerecognizer.javacv.Train;
 import com.ifba.ads.Facerecognizer.utils.FileUtils;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
@@ -24,14 +26,20 @@ import com.sun.jersey.multipart.FormDataParam;
 @Path("/upload")
 public class Service {
 	
-	private static final String UPLOAD_FOLDER = "/home/alex/";
+	private static final String UPLOAD_FOLDER_PATTERN = "/home/alex/fotos";
+	private static final String LOCAL_FACES_DETECTEDS = "/home/alex/eclipse-workspace/Facerecognizer/fotos";
 
 	@POST
 	@Path("1")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response training( 
 			@FormDataParam("file") InputStream uploadedInputStream,
-	        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
+	        @FormDataParam("file") FormDataContentDisposition fileDetail,
+	        @FormDataParam("nome") Integer id) throws IOException {
+		
+		Mat face = null;
+		File dirLocal = null;
+		
 		
 		// check if all form parameters are provided
 		if (uploadedInputStream == null || fileDetail == null) {
@@ -41,12 +49,13 @@ public class Service {
 
 		// create our destination folder, if it not exists
 		try {
-			FileUtils.createFolderIfNotExists(UPLOAD_FOLDER);
+			dirLocal = FileUtils.createFolderIfNotExists(UPLOAD_FOLDER_PATTERN + id);
 		} catch (SecurityException se) {
 			return Response.status(500).entity("Can not create destination folder on server").build();
 		}
 		
-		String uploadedFileLocation = UPLOAD_FOLDER + fileDetail.getFileName();
+		String uploadedFileLocation = dirLocal.getAbsolutePath() + "/" + fileDetail.getFileName();
+		System.out.println(uploadedFileLocation);
 		try {
 			FileUtils.saveToFile(uploadedInputStream, uploadedFileLocation);
 		} catch (IOException e) {
@@ -54,16 +63,16 @@ public class Service {
 		}
 		
 		try {
-			System.out.println(uploadedFileLocation);
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
-			DetectFaces.detectFaces(image);
+			face = DetectFaces.detectFaces(image);
+			imwrite("/home/alex/eclipse-workspace/Facerecognizer/fotos/pessoa." + id + "." + 1 + ".jpg", face);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		try {
-			System.out.println(Training.train());
+			System.out.println(Train.train(FileUtils.getFiles(LOCAL_FACES_DETECTEDS)));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,6 +89,7 @@ public class Service {
 	        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
 		
 		Mat face = null;
+		File dirLocal = null;
 		
 		// check if all form parameters are provided
 		if (uploadedInputStream == null || fileDetail == null) {
@@ -89,12 +99,12 @@ public class Service {
 
 		// create our destination folder, if it not exists
 		try {
-			FileUtils.createFolderIfNotExists(UPLOAD_FOLDER);
+			dirLocal = FileUtils.createFolderIfNotExists(UPLOAD_FOLDER_PATTERN);
 		} catch (SecurityException se) {
 			return Response.status(500).entity("Can not create destination folder on server").build();
 		}
 		
-		String uploadedFileLocation = UPLOAD_FOLDER + fileDetail.getFileName();
+		String uploadedFileLocation = dirLocal.getAbsolutePath() + "/" + fileDetail.getFileName();
 		try {
 			FileUtils.saveToFile(uploadedInputStream, uploadedFileLocation);
 		} catch (IOException e) {
@@ -105,6 +115,7 @@ public class Service {
 			System.out.println(uploadedFileLocation);
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
 			face = DetectFaces.detectFaces(image);
+			imwrite("/home/alex/pessoa."  + 1 + ".jpg", face);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
