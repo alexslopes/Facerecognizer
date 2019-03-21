@@ -1,4 +1,4 @@
-package com.ifba.ads.Facerecognizer.utils;
+package com.ifba.ads.Facerecognizer.utils.File;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;

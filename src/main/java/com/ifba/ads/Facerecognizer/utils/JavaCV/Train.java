@@ -1,4 +1,4 @@
-package com.ifba.ads.Facerecognizer.javacv;
+package com.ifba.ads.Facerecognizer.utils.JavaCV;
 
 import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
 import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
@@ -19,7 +19,7 @@ public class Train {
 	
 	public static final int IMG_SIZE = 160;
 
-    public static final String EIGEN_FACES_CLASSIFIER = "/home/alex/eclipse-workspace/Facerecognizer/recursos/eigenFacesClassifier.yml";
+    public static final String EIGEN_FACES_CLASSIFIER = "/home/alex/Code Projects/eclipse-workspace/Facerecognizer/recursos/eigenFacesClassifier.yml";
     public static final String FISHER_FACES_CLASSIFIER = "fisherFacesClassifier.yml";
     public static final String LBPH_FACES_CLASSIFIER = "lbphFacesClassifier.yml";
     
