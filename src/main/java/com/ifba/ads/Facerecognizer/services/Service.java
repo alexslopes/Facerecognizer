@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +28,13 @@ import com.ifba.ads.Facerecognizer.utils.File.FileUtils;
 import com.ifba.ads.Facerecognizer.utils.JavaCV.DetectFaces;
 import com.ifba.ads.Facerecognizer.utils.JavaCV.Recognize;
 import com.ifba.ads.Facerecognizer.utils.JavaCV.Train;
+import com.ifba.ads.Facerecognizer.utils.paths.Paths;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
+import com.sun.research.ws.wadl.Resource;
 
 @Path("/upload")
 public class Service {
-	
-	private static final String UPLOAD_FOLDER_PATTERN = "/home/alex/fotos";
-	private static final String LOCAL_FACES_DETECTEDS = "/home/alex/Code Projects/eclipse-workspace/Facerecognizer/fotos";
-
 	
 	@POST
 	@Path("register")
@@ -66,20 +65,21 @@ public class Service {
 	        @FormDataParam("file") FormDataContentDisposition fileDetail,
 	        @FormDataParam("id") Integer id) throws IOException {
 		
-		System.out.println(id);
 		
 		Mat face = null;
-		File dirLocal = null;		
+		File dirLocal = null;
+		File faceDir = null;
 		// TODO evitar escrever em arquivo caso o valor do id seja null
 		// check if all form parameters are provided
 		if (uploadedInputStream == null || fileDetail == null || id == null) {
 			return Response.status(400).entity("Dados incompletos").build();
 		}
-				
+
 
 		// create our destination folder, if it not exists
 		try {
-			dirLocal = FileUtils.createFolderIfNotExists(UPLOAD_FOLDER_PATTERN + id);
+			dirLocal = FileUtils.createFolderIfNotExists(Paths.UPLOAD_FOLDER_PATTERN + id);
+			faceDir = FileUtils.createFolderIfNotExists(Paths.LOCAL_FACES_DETECTEDS);
 		} catch (SecurityException se) {
 			return Response.status(500).entity("Can not create destination folder on server").build();
 		}
@@ -95,14 +95,16 @@ public class Service {
 		try {
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
 			face = DetectFaces.detectFaces(image);
-			imwrite("/home/alex/Code Projects/eclipse-workspace/Facerecognizer/fotos/pessoa." + id + "." + 1 + ".jpg", face);
+			
+			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + id + "." + 1 + ".jpg", face));
+			dirLocal.delete(); 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		try {
-			System.out.println(Train.train(FileUtils.getFiles(LOCAL_FACES_DETECTEDS)));
+			System.out.println(Train.train(FileUtils.getFiles(Paths.LOCAL_FACES_DETECTEDS)));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -135,7 +137,7 @@ public class Service {
 
 		// create our destination folder, if it not exists
 		try {
-			dirLocal = FileUtils.createFolderIfNotExists(UPLOAD_FOLDER_PATTERN);
+			dirLocal = FileUtils.createFolderIfNotExists(Paths.UPLOAD_FOLDER_PATTERN);
 		} catch (SecurityException se) {
 			return "Can not create destination folder on server";
 		}

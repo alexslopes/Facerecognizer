@@ -1,7 +1,6 @@
 package com.ifba.ads.Facerecognizer.utils.JavaCV;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 import org.bytedeco.javacpp.opencv_core;
@@ -15,14 +14,15 @@ import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 public class DetectFaces {
 
-	static CascadeClassifier faceDetector = new CascadeClassifier("/home/alex/Code Projects/eclipse-workspace/Facerecognizer/cascades/frontalface.xml");
+	public static String cascadeClassifier = "/home/alex/Code-Projects/eclipse-workspace/Facerecognizer/cascades/frontalface.xml";
+	
 	//TODO fazer retornar a face detectada e armazenar em um array
 	public static Mat detectFaces(BufferedImage image) throws IOException {
 		
+		CascadeClassifier faceDetector = new CascadeClassifier(cascadeClassifier);
 		Rect mainFace;
 		Mat rgbaMat = FileUtils.BufferedImage2Mat(image);
 		Mat greyMat = new Mat();

@@ -7,11 +7,13 @@ import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_face;
 
+import com.ifba.ads.Facerecognizer.utils.paths.Paths;
+
 public class Recognize {
 	
 	public static String recognize(Mat face) {
 		opencv_face.FaceRecognizer recognizer =  opencv_face.EigenFaceRecognizer.create();
-		File f = new File(Train.EIGEN_FACES_CLASSIFIER);
+		File f = new File(Paths.EIGEN_FACES_CLASSIFIER);
         recognizer.read(f.getAbsolutePath());
         IntPointer label = new IntPointer(1);
         DoublePointer confiability = new DoublePointer(1);
