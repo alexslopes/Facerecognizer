@@ -59,4 +59,34 @@ public class FileUtils {
         
         return photosFolder.listFiles(imageFilter);
 	}
+	
+	public static int qtdPhotosById(File dir, int id) {
+		int cont = 0;
+        if (dir.exists()) {
+            FilenameFilter imageFilter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".jpg") || name.endsWith(".gif") || name.endsWith(".png");
+                }
+            };
+
+            File[] files = dir.listFiles(imageFilter);
+            
+            for(File file : files) {
+            	if(Integer.parseInt(file.getName().split("\\.")[1]) == id)
+            		cont++;
+            }
+            
+            return files != null ? cont : 0;
+        }
+        return 0;
+    }
+	
+	public static void deleteFilesInAFolder(File dir) {
+		String[]entries = dir.list();
+		for(String s: entries){
+		    File currentFile = new File(dir.getPath(),s);
+		    currentFile.delete();
+		}
+	}
 }

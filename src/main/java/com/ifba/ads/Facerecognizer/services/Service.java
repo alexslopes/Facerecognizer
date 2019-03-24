@@ -13,6 +13,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.websocket.server.PathParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -38,9 +39,9 @@ public class Service {
 	
 	@POST
 	@Path("register")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response register( 
-			@FormDataParam("name") String name) throws IOException {
+			@FormParam("name") String name) throws IOException {
 		
 		Person person = new Person();
 		person.setNome(name);
@@ -96,8 +97,9 @@ public class Service {
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
 			face = DetectFaces.detectFaces(image);
 			
-			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + id + "." + 1 + ".jpg", face));
-			dirLocal.delete(); 
+			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + id + "." + (FileUtils.qtdPhotosById(faceDir, id) + 1) + ".jpg", face));
+			FileUtils.deleteFilesInAFolder(dirLocal); 
+			dirLocal.delete();	
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -176,7 +178,7 @@ public class Service {
 		System.out.println(pessoa.getNome());
 		
 		if(personId != null)
-			return "Face reconhecida: " + personId;
+			return personId;
 		else
 			return "Face não reconhecida";
 	}

@@ -4,7 +4,7 @@ form {
 }
 </style>
 Cadastro<br>
-<form action="http://localhost:8080/Facerecognizer/services/upload/register" method="post" enctype="multipart/form-data">
+<form action="http://localhost:8080/Facerecognizer/services/upload/register" method="post">
 	<input name="name" type="text" /><br><br>
     <button name="submit" type="submit">Upload</button>
 </form>
