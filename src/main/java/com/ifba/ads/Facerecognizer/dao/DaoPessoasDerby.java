@@ -10,10 +10,12 @@ import com.ifba.ads.Facerecognizer.model.Person;
 public class DaoPessoasDerby  implements DAOPessoas{
 
 	@Override
-	public boolean inserir(Person pessoa) throws Exception {
+	public boolean inserir(String login, String password, String name) throws Exception {
 		Connection conn=ConexaoPessoasDerby.getInstance().getConexao();
-        PreparedStatement pst=conn.prepareStatement("insert into JavaCV.pessoas (nome) values (?)");
-        pst.setString(1, pessoa.getNome());
+        PreparedStatement pst=conn.prepareStatement("insert into JavaCv.User (login,password,name) values (?,?,?)");
+        pst.setString(1, login);
+        pst.setString(2, password);
+        pst.setString(3, name);
         pst.executeUpdate();
         pst.close();
         return true;
@@ -22,16 +24,35 @@ public class DaoPessoasDerby  implements DAOPessoas{
 	@Override
 	public Person buscar(int id) throws Exception {
 		Connection conn=ConexaoPessoasDerby.getInstance().getConexao();
-        PreparedStatement pst=conn.prepareStatement("select * from JavaCV.pessoas where id=?");
+        PreparedStatement pst=conn.prepareStatement("select * from JavaCv.User where id=?");
         pst.setString(1, String.valueOf(id));
         ResultSet rs=pst.executeQuery();
         
-        Person person = new Person();
-        rs.next();
-        person.setId(rs.getInt("id"));
-        person.setNome(rs.getString("nome"));
+        Person person = null;
+        if(rs.next()) {
+        	person = new Person();
+	        person.setId(rs.getInt("id"));
+	        person.setNome(rs.getString("name"));
+        }
   
         return person;
+	}
+
+	@Override
+	public Person logar(String login, String password) throws Exception {
+		Connection conn=ConexaoPessoasDerby.getInstance().getConexao();
+        PreparedStatement pst=conn.prepareStatement("select * from JavaCv.User where login=? and password=?");
+        pst.setString(1, login);
+        pst.setString(2, password);
+        
+        ResultSet rs=pst.executeQuery();
+        
+        Person person = new Person();
+        if(rs.next()) {
+	        person.setId(rs.getInt("id"));
+	        person.setNome(rs.getString("name"));
+        }
+		return person;
 	}
 
 }

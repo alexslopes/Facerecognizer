@@ -41,6 +41,8 @@ public class Service {
 	@Path("register")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response register( 
+			@FormParam("login") String login,
+			@FormParam("password") String password,
 			@FormParam("name") String name) throws IOException {
 		
 		Person person = new Person();
@@ -49,14 +51,35 @@ public class Service {
 		DAOPessoas derby = new DaoPessoasDerby();
 		
 		try {
-			derby.inserir(person);
+			if(derby.inserir(login,password,name));
+				return Response.status(200).entity("Dados salvos").build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(200).entity("Não foi possível salvar os dados").build();
 		}
-		
-		return Response.status(200).entity("Dados salvos").build();
 	}
+	
+	@POST
+	@Path("login")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces({MediaType.APPLICATION_JSON})
+	public Person login( 
+			@FormParam("login") String login,
+			@FormParam("password") String password) throws IOException {
+
+		DAOPessoas derby = new DaoPessoasDerby();
+		Person person = null;
+		
+		try {
+			person = derby.logar(login, password);
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return person;
+	}
+	
 	
 	@POST
 	@Path("training")
@@ -64,22 +87,33 @@ public class Service {
 	public Response training( 
 			@FormDataParam("file") InputStream uploadedInputStream,
 	        @FormDataParam("file") FormDataContentDisposition fileDetail,
-	        @FormDataParam("id") Integer id) throws IOException {
+	        @FormDataParam("login") String login,
+	        @FormDataParam("password") String password) throws IOException {
 		
 		
 		Mat face = null;
 		File dirLocal = null;
 		File faceDir = null;
-		// TODO evitar escrever em arquivo caso o valor do id seja null
-		// check if all form parameters are provided
-		if (uploadedInputStream == null || fileDetail == null || id == null) {
+		
+
+		DAOPessoas derby = new DaoPessoasDerby();
+		Person person = null;
+		
+		try {
+			person = derby.logar(login, password);
+				
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (uploadedInputStream == null || fileDetail == null || person == null) {
 			return Response.status(400).entity("Dados incompletos").build();
 		}
 
 
 		// create our destination folder, if it not exists
 		try {
-			dirLocal = FileUtils.createFolderIfNotExists(Paths.UPLOAD_FOLDER_PATTERN + id);
+			dirLocal = FileUtils.createFolderIfNotExists(Paths.UPLOAD_FOLDER_PATTERN + person.getId());
 			faceDir = FileUtils.createFolderIfNotExists(Paths.LOCAL_FACES_DETECTEDS);
 		} catch (SecurityException se) {
 			return Response.status(500).entity("Can not create destination folder on server").build();
@@ -97,7 +131,7 @@ public class Service {
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
 			face = DetectFaces.detectFaces(image);
 			
-			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + id + "." + (FileUtils.qtdPhotosById(faceDir, id) + 1) + ".jpg", face));
+			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + person.getId() + "." + (FileUtils.qtdPhotosById(faceDir, person.getId()) + 1) + ".jpg", face));
 			FileUtils.deleteFilesInAFolder(dirLocal); 
 			dirLocal.delete();	
 		} catch (IOException e) {
