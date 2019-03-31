@@ -1,7 +1,7 @@
 package com.ifba.ads.Facerecognizer.utils.JavaCV;
 
 import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
+import static org.bytedeco.javacpp.opencv_imgcodecs.IMREAD_GRAYSCALE;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgproc.resize;
 
@@ -28,7 +28,7 @@ public class Train {
 	        IntBuffer rotulosBuffer = labels.createBuffer();
 	        int counter = 0;
 	        for (File image : files) {
-	            Mat photo = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
+	            Mat photo = imread(image.getAbsolutePath(), IMREAD_GRAYSCALE);
 	            int classe = Integer.parseInt(image.getName().split("\\.")[1]);
 	            resize(photo, photo, new Size(IMG_SIZE, IMG_SIZE));
 	            photos.put(counter, photo);

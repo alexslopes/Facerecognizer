@@ -13,6 +13,9 @@ import javax.imageio.ImageIO;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_imgcodecs;
+import org.bytedeco.javacv.Java2DFrameConverter;
+import org.bytedeco.javacv.OpenCVFrameConverter;
+
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
 public class FileUtils {
@@ -40,10 +43,8 @@ public class FileUtils {
 	}
 	
 	public static Mat BufferedImage2Mat(BufferedImage image) throws IOException {
-		 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		    ImageIO.write(image, "jpg", byteArrayOutputStream);
-		    byteArrayOutputStream.flush();
-		    return imdecode(new Mat(byteArrayOutputStream.toByteArray()), CV_LOAD_IMAGE_UNCHANGED);
+		OpenCVFrameConverter.ToMat cv = new OpenCVFrameConverter.ToMat();
+        return cv.convertToMat(new Java2DFrameConverter().convert(image)); 
 	}
 	
 	public static File[] getFiles(String local) {

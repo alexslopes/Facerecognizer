@@ -47,8 +47,9 @@ public class DaoPessoasDerby  implements DAOPessoas{
         
         ResultSet rs=pst.executeQuery();
         
-        Person person = new Person();
+        Person person = null;
         if(rs.next()) {
+        	person = new Person();
 	        person.setId(rs.getInt("id"));
 	        person.setNome(rs.getString("name"));
         }

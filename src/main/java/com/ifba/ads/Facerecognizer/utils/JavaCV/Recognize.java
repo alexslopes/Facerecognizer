@@ -1,6 +1,7 @@
 package com.ifba.ads.Facerecognizer.utils.JavaCV;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
@@ -11,9 +12,15 @@ import com.ifba.ads.Facerecognizer.utils.paths.Paths;
 
 public class Recognize {
 	
+	private static File f;
+	
 	public static String recognize(Mat face) {
 		opencv_face.FaceRecognizer recognizer =  opencv_face.EigenFaceRecognizer.create();
-		File f = new File(Paths.EIGEN_FACES_CLASSIFIER);
+		
+		if(f == null) {
+			f = new File(Paths.EIGEN_FACES_CLASSIFIER);
+		}
+			
         recognizer.read(f.getAbsolutePath());
         IntPointer label = new IntPointer(1);
         DoublePointer confiability = new DoublePointer(1);

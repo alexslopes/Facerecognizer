@@ -6,7 +6,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,8 @@ public class Service {
 			@FormParam("login") String login,
 			@FormParam("password") String password,
 			@FormParam("name") String name) throws IOException {
+		
+		
 		
 		Person person = new Person();
 		person.setNome(name);
@@ -95,6 +99,9 @@ public class Service {
 		File dirLocal = null;
 		File faceDir = null;
 		
+		
+			System.out.println(getClass().getClassLoader().getResource(".").getPath());
+		
 
 		DAOPessoas derby = new DaoPessoasDerby();
 		Person person = null;
@@ -107,7 +114,7 @@ public class Service {
 		}
 		
 		if (uploadedInputStream == null || fileDetail == null || person == null) {
-			return Response.status(400).entity("Dados incompletos").build();
+			return Response.status(400).entity("Dados incompletos/incorretos").build();
 		}
 
 

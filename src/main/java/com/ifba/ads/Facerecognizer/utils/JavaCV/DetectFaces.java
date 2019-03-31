@@ -2,6 +2,7 @@ package com.ifba.ads.Facerecognizer.utils.JavaCV;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -9,6 +10,7 @@ import org.bytedeco.javacpp.opencv_core.Rect;
 import org.bytedeco.javacpp.opencv_objdetect.CascadeClassifier;
 
 import com.ifba.ads.Facerecognizer.utils.File.FileUtils;
+import com.ifba.ads.Facerecognizer.utils.paths.Paths;
 
 import static org.bytedeco.javacpp.opencv_imgproc.CV_BGR2GRAY;
 import static org.bytedeco.javacpp.opencv_imgproc.cvtColor;
@@ -16,13 +18,16 @@ import static org.bytedeco.javacpp.opencv_imgproc.resize;
 import static org.bytedeco.javacpp.opencv_core.RectVector;
 
 public class DetectFaces {
-
-	public static String cascadeClassifier = "/home/alex/Code-Projects/eclipse-workspace/Facerecognizer/cascades/frontalface.xml";
+	
+	private static CascadeClassifier faceDetector;
 	
 	//TODO fazer retornar a face detectada e armazenar em um array
 	public static Mat detectFaces(BufferedImage image) throws IOException {
 		
-		CascadeClassifier faceDetector = new CascadeClassifier(cascadeClassifier);
+		if(faceDetector == null) {
+			faceDetector = new CascadeClassifier(Paths.FRONTAL_FACE_CLASSIFIER);
+		}
+			
 		Rect mainFace;
 		Mat rgbaMat = FileUtils.BufferedImage2Mat(image);
 		Mat greyMat = new Mat();
