@@ -22,7 +22,7 @@ public class ConexaoPessoasDerby {
 	    private Connection connection;
 	    private void setConexao() throws Exception{
 	        Class.forName("com.mysql.jdbc.Driver");
-	        Connection conn=DriverManager.getConnection("jdbc:mysql://localhost:3306/JavaCv","root","camamu");
+	        Connection conn=DriverManager.getConnection("jdbc:mysql://mysql:3306/JavaCv","root","camamu");
 	        connection =conn;
 	    }
 	    
