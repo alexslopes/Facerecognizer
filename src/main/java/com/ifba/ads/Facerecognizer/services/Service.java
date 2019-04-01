@@ -28,13 +28,10 @@ import com.ifba.ads.Facerecognizer.dao.DAOPessoas;
 import com.ifba.ads.Facerecognizer.dao.DaoPessoasDerby;
 import com.ifba.ads.Facerecognizer.model.Person;
 import com.ifba.ads.Facerecognizer.utils.File.FileUtils;
-import com.ifba.ads.Facerecognizer.utils.JavaCV.DetectFaces;
-import com.ifba.ads.Facerecognizer.utils.JavaCV.Recognize;
-import com.ifba.ads.Facerecognizer.utils.JavaCV.Train;
+import com.ifba.ads.Facerecognizer.utils.JavaCV.JavaCv;
 import com.ifba.ads.Facerecognizer.utils.paths.Paths;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import com.sun.research.ws.wadl.Resource;
 
 @Path("/upload")
 public class Service {
@@ -55,8 +52,7 @@ public class Service {
 		DAOPessoas derby = new DaoPessoasDerby();
 		
 		try {
-			if(derby.inserir(login,password,name));
-				return Response.status(200).entity("Dados salvos").build();
+			return Response.status(200).entity(derby.inserir(login,password,name)).build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return Response.status(200).entity("Não foi possível salvar os dados").build();
@@ -94,8 +90,6 @@ public class Service {
 	        @FormDataParam("login") String login,
 	        @FormDataParam("password") String password) throws IOException {
 		
-		
-		Mat face = null;
 		File dirLocal = null;
 		File faceDir = null;
 		
@@ -104,6 +98,7 @@ public class Service {
 		
 
 		DAOPessoas derby = new DaoPessoasDerby();
+		JavaCv javacv = JavaCv.getInstance();
 		Person person = null;
 		
 		try {
@@ -136,9 +131,12 @@ public class Service {
 		// TODO substituir 1 pela qunatidade de fotos tiradas
 		try {
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
-			face = DetectFaces.detectFaces(image);
+			List<Mat> faces;
+			faces = javacv.detectFaces(image);
+			if(faces.size() > 1)
+				return Response.status(200).entity("Foto com mais de ua face, porfavor insira uma foto com apenas um rosto").build();
 			
-			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + person.getId() + "." + (FileUtils.qtdPhotosById(faceDir, person.getId()) + 1) + ".jpg", face));
+			System.out.println(imwrite(faceDir.getAbsolutePath() + "/person." + person.getId() + "." + (FileUtils.qtdPhotosById(faceDir, person.getId()) + 1) + ".jpg", faces.get(0)));
 			FileUtils.deleteFilesInAFolder(dirLocal); 
 			dirLocal.delete();	
 		} catch (IOException e) {
@@ -147,7 +145,7 @@ public class Service {
 		}
 		
 		try {
-			System.out.println(Train.train(FileUtils.getFiles(Paths.LOCAL_FACES_DETECTEDS)));
+			javacv.train(FileUtils.getFiles(Paths.LOCAL_FACES_DETECTEDS));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -161,20 +159,21 @@ public class Service {
 	@Path("recognize")
 	@Produces({MediaType.APPLICATION_JSON})
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public String recognize( 
+	public List<Person> recognize( 
 			@FormDataParam("file") InputStream uploadedInputStream,
 	        @FormDataParam("file") FormDataContentDisposition fileDetail) throws IOException {
 		
-		Mat face = null;
+		List<Mat> faces = null;
+		List<String> idList = null;
+		List<Person> personList = null;
 		File dirLocal = null;
-		String personId = null;
 		String nome = null;
 		DAOPessoas derby = new DaoPessoasDerby();
-		Person pessoa = new Person();
+		JavaCv javacv = JavaCv.getInstance();
 		
 		// check if all form parameters are provided
 		if (uploadedInputStream == null || fileDetail == null) {
-			return "Invalid form data";
+			System.out.println("Parâmetros incompletos");
 		}
 				
 
@@ -182,27 +181,33 @@ public class Service {
 		try {
 			dirLocal = FileUtils.createFolderIfNotExists(Paths.UPLOAD_FOLDER_PATTERN);
 		} catch (SecurityException se) {
-			return "Can not create destination folder on server";
+			se.printStackTrace();
 		}
 		
 		String uploadedFileLocation = dirLocal.getAbsolutePath() + "/" + fileDetail.getFileName();
 		try {
 			FileUtils.saveToFile(uploadedInputStream, uploadedFileLocation);
 		} catch (IOException e) {
-			return "Can not save file";
+			e.printStackTrace();
 		}
 		
 		try {
 			System.out.println(uploadedFileLocation);
 			BufferedImage image = ImageIO.read(new File(uploadedFileLocation));
-			face = DetectFaces.detectFaces(image);
+			faces = javacv.detectFaces(image);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
 		try {
-			personId = Recognize.recognize(face);
+			
+			for(Mat face : faces) {
+				idList = new ArrayList<>();
+				String id = javacv.recognize(face);
+				if(id != null)
+					idList.add(id);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -210,17 +215,17 @@ public class Service {
 
 				
 		try {
-			pessoa = derby.buscar(Integer.parseInt(personId));
+			for(String id : idList) {
+				personList = new ArrayList<>();
+				Person person = derby.buscar(Integer.parseInt(id));
+				if(person != null)
+					personList.add(person);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		System.out.println(pessoa.getNome());
-		
-		if(personId != null)
-			return personId;
-		else
-			return "Face não reconhecida";
+
+		return personList;
 	}
 }
